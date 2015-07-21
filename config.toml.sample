@@ -1,0 +1,14 @@
+[slackbot]
+slack_token = "slack_bot_token"
+bot_name = "data"
+
+[warranty]
+path = "/opt/warranty/warranty"
+
+[phone]
+username = "2034567890"
+password = "1111"
+url = "http://comm.portal.com"
+
+[autopkg]
+path = "/usr/local/bin/autopkg"
