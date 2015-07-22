@@ -50,7 +50,7 @@ type Hello struct {
 }
 
 // Register implements plugins.Registrator
-func (h Hello) Register() victor.HandlerDocPair {
+func (h Hello) Register() []victor.HandlerDocPair {
 	return []victor.HandlerDocPair{
 		&victor.HandlerDoc{
 			CmdHandler:     h.helloFunc,
