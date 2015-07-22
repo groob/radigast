@@ -1,2 +1,3 @@
 *.toml
-cmd/cmd
+cmd/radigast/radigast
+pkg/
