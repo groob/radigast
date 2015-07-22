@@ -66,7 +66,7 @@ func runBot(bot victor.Robot) {
 		}
 	}()
 
-	go bot.Run()
+	bot.Run()
 	go monitorErrors(bot.ChatErrors())
 	go monitorEvents(bot.ChatEvents())
 	// keep the process (and bot) alive
@@ -78,7 +78,10 @@ func runBot(bot victor.Robot) {
 
 func monitorErrors(errorChannel <-chan events.ErrorEvent) {
 	for {
-		err := <-errorChannel
+		err, ok := <-errorChannel
+		if !ok {
+			return
+		}
 		if err.IsFatal() {
 			log.Panic(err.Error())
 		}
@@ -86,9 +89,12 @@ func monitorErrors(errorChannel <-chan events.ErrorEvent) {
 	}
 }
 
-func monitorEvents(eventChannel <-chan events.ChatEvent) {
+func monitorEvents(eventsChannel chan events.ChatEvent) {
 	for {
-		event := <-eventChannel
-		log.Println("Chat Adapter Event:", event)
+		e, ok := <-eventsChannel
+		if !ok {
+			return
+		}
+		log.Printf("Chat Event: %+v", e)
 	}
 }
