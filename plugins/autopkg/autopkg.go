@@ -14,7 +14,7 @@ type Autopkg struct {
 	AllowedUsers []string
 }
 
-func (a Autopkg) Register() victor.HandlerDocPair {
+func (a Autopkg) Register() []victor.HandlerDocPair {
 	// Allow everyone or just a specific group of users?
 	var handler victor.HandlerFunc
 	if len(a.AllowedUsers) == 0 {
@@ -23,11 +23,13 @@ func (a Autopkg) Register() victor.HandlerDocPair {
 		handler = victor.OnlyAllow(a.AllowedUsers, a.autopkgFunc)
 	}
 
-	return &victor.HandlerDoc{
-		CmdHandler:     handler,
-		CmdName:        "autopkg",
-		CmdDescription: "check for new versions of software and add to munki",
-		CmdUsage:       []string{""},
+	return []victor.HandlerDocPair{
+		&victor.HandlerDoc{
+			CmdHandler:     handler,
+			CmdName:        "autopkg",
+			CmdDescription: "check for new versions of software and add to munki",
+			CmdUsage:       []string{""},
+		},
 	}
 }
 

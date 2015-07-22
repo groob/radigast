@@ -17,14 +17,16 @@ type Phone struct {
 	URL      string
 }
 
-func (c Phone) Register() victor.HandlerDocPair {
-	return &victor.HandlerDoc{
-		CmdHandler:     c.phoneLine,
-		CmdName:        "phone",
-		CmdDescription: "Prints the phone line or extension for a user",
-		CmdUsage: []string{
-			"[options] NAME",
-			"-line _return direct line instead of extension_",
+func (c Phone) Register() []victor.HandlerDocPair {
+	return []victor.HandlerDocPair{
+		&victor.HandlerDoc{
+			CmdHandler:     c.phoneLine,
+			CmdName:        "phone",
+			CmdDescription: "Prints the phone line or extension for a user",
+			CmdUsage: []string{
+				"[options] NAME",
+				"-line _return direct line instead of extension_",
+			},
 		},
 	}
 }

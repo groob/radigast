@@ -16,12 +16,14 @@ type Warranty struct {
 }
 
 // Register returns the victor handler
-func (w Warranty) Register() victor.HandlerDocPair {
-	return &victor.HandlerDoc{
-		CmdHandler:     w.warrantyFunc,
-		CmdName:        "warranty",
-		CmdDescription: "Check Mac hardware warranty",
-		CmdUsage:       []string{"SERIAL"},
+func (w Warranty) Register() []victor.HandlerDocPair {
+	return []victor.HandlerDocPair{
+		&victor.HandlerDoc{
+			CmdHandler:     w.warrantyFunc,
+			CmdName:        "warranty",
+			CmdDescription: "Check Mac hardware warranty",
+			CmdUsage:       []string{"SERIAL"},
+		},
 	}
 }
 

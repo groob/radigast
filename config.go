@@ -76,8 +76,11 @@ func (c Config) LoadPlugins(r victor.Robot) {
 		// must do before registering the plugin
 		c.applyPluginConfig(name, plugin)
 
-		// register plugin with bot
-		r.HandleCommand(plugin.Register())
+		// register a plugin's handlers with bot
+		handlers := plugin.Register()
+		for _, handler := range handlers {
+			r.HandleCommand(handler)
+		}
 
 		log.Printf("Loaded %s\n", name)
 	}

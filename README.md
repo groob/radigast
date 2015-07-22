@@ -25,7 +25,7 @@ Radigast uses the same plugin model as [telegraf](https://github.com/influxdb/te
 ## Plugin Interface
 ```Go
 type Registrator interface {
-	Register() victor.HandlerDocPair
+	Register() []victor.HandlerDocPair
 }
 ```
 ## Plugin example
@@ -50,11 +50,13 @@ type Hello struct {
 
 // Register implements plugins.Registrator
 func (h Hello) Register() victor.HandlerDocPair {
-	return &victor.HandlerDoc{
-		CmdHandler:     h.helloFunc,
-		CmdName:        "hello",
-		CmdDescription: "reply back with the user name",
-		CmdUsage:       []string{"NAME"},
+	return []victor.HandlerDocPair{
+		&victor.HandlerDoc{
+			CmdHandler:     h.helloFunc,
+			CmdName:        "hello",
+			CmdDescription: "reply back with the user name",
+			CmdUsage:       []string{"NAME"},
+		},
 	}
 }
 
