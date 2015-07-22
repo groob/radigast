@@ -65,7 +65,7 @@ func (h Hello) Register() []victor.HandlerDocPair {
 // write your plugin logic here.
 func (h Hello) helloFunc(s victor.State) {
 	msg := fmt.Sprintf("Hello %s!", s.Message().User().Name())
-	s.Chat().Send(s.Message().Channel().ID(), msg)
+	s.Reply(msg)
 }
 
 func init() {
