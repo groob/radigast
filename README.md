@@ -7,7 +7,7 @@ and uses the Slack Real Time Messaging API.
 Radigast loads configuration from a TOML file. 
 The main configuration must be under `[radigast]` and the configuration for each plugin must be under `[plugin_name]`
 
-See [config.toml.sample]() for a complete example.
+See [config.toml.sample](https://github.com/groob/radigast/blob/master/config.toml.sample) for a complete example.
 
 # How to use it
 Run `radigast -config radigast.toml` to connect to slack.
