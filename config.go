@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
+	"net/rpc"
 
 	"github.com/FogCreek/victor"
 	"github.com/groob/radigast/plugins"
@@ -13,10 +14,13 @@ import (
 
 // Config holds the radigast configuration
 type Config struct {
-	SlackToken string
-	BotName    string
+	SlackToken  string
+	BotName     string
+	PluginsPath string
+	Rpcplugins  []string
 
 	plugins map[string]*ast.Table
+	client  *rpc.Client
 }
 
 // Invalid toml config
@@ -79,6 +83,16 @@ func (c Config) LoadPlugins(r victor.Robot) {
 
 	// Add default handler to show "unrecognized command" on "command" messages
 	r.SetDefaultHandler(defaultFunc)
+}
+
+func (c Config) LoadRPCPlugins(r victor.Robot) {
+	for _, name := range c.Rpcplugins {
+		plugin := plugins.NewRPCPlugin(name, c.PluginsPath)
+		handlers := plugin.Register()
+		for _, handler := range handlers {
+			r.HandleCommand(handler)
+		}
+	}
 }
 
 func (c Config) applyPluginConfig(name string, plugin plugins.Registrator, r victor.Robot) {

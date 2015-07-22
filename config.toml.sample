@@ -1,6 +1,8 @@
 [slackbot]
 slack_token = "slack_bot_token"
 bot_name = "data"
+plugins_path = "/opt/radigast/plugins"
+rpcplugins = ["HelloRPC"]
 
 [warranty]
 path = "/opt/warranty/warranty"
