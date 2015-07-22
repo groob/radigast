@@ -21,6 +21,7 @@ Radigast uses the same plugin model as [telegraf](https://github.com/influxdb/te
 * A plugin must conform to the `plugins.Registrator` interface
 * Plugins should call plugins.Add in their init function to register themselves
 * To be available to the Radigast command, plugins must be added to the `github.com/groob/radigast/plugins/all/all.go` file.
+* A plugin will only be configured by radigast if there is a `[plugin_name]` section in the config file
 
 ## Plugin Interface
 ```Go

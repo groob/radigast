@@ -62,7 +62,7 @@ func LoadConfig(path string) (*Config, error) {
 // LoadPlugins registers victor.Handlers with radigast
 // and adds any additional configuration to the plugin
 func (c Config) LoadPlugins(r victor.Robot) {
-	log.Printf("Loading %v plugins\n", len(plugins.Plugins))
+	log.Printf("Loading %v plugins\n", len(c.plugins))
 
 	for name := range plugins.Plugins {
 		registrator, ok := plugins.Plugins[name]
@@ -73,8 +73,20 @@ func (c Config) LoadPlugins(r victor.Robot) {
 		plugin := registrator()
 
 		// apply configuration to the plugin
-		// must do before registering the plugin
-		c.applyPluginConfig(name, plugin)
+		c.applyPluginConfig(name, plugin, r)
+
+	}
+
+	// Add default handler to show "unrecognized command" on "command" messages
+	r.SetDefaultHandler(defaultFunc)
+}
+
+func (c Config) applyPluginConfig(name string, plugin plugins.Registrator, r victor.Robot) {
+	if tbl, ok := c.plugins[name]; ok {
+		err := toml.UnmarshalTable(tbl, plugin)
+		if err != nil {
+			log.Printf("Couldn't Unmarshal config for %v\n", name)
+		}
 
 		// register a plugin's handlers with bot
 		handlers := plugin.Register()
@@ -83,18 +95,6 @@ func (c Config) LoadPlugins(r victor.Robot) {
 		}
 
 		log.Printf("Loaded %s\n", name)
-	}
-
-	// Add default handler to show "unrecognized command" on "command" messages
-	r.SetDefaultHandler(defaultFunc)
-}
-
-func (c Config) applyPluginConfig(name string, plugin plugins.Registrator) {
-	if tbl, ok := c.plugins[name]; ok {
-		err := toml.UnmarshalTable(tbl, plugin)
-		if err != nil {
-			log.Printf("Couldn't Unmarshal config for %v\n", name)
-		}
 	}
 }
 
