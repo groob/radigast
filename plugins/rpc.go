@@ -97,6 +97,7 @@ func (p RPCPlugin) handleFunc(s victor.State) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer p.client.Close()
 	err = p.client.Call(fmt.Sprintf("%v.Handle", p.name),
 		args, &msg)
 	if err != nil {
