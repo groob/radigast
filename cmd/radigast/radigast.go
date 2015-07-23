@@ -11,7 +11,6 @@ import (
 	"github.com/FogCreek/victor/pkg/chat/slackRealtime"
 	"github.com/FogCreek/victor/pkg/events"
 	"github.com/groob/radigast"
-	_ "github.com/groob/radigast/plugins/all"
 )
 
 var fConfig = flag.String("config", "", "configuration file to load")
