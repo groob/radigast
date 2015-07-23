@@ -12,10 +12,36 @@ See [config.toml.sample](https://github.com/groob/radigast/blob/master/config.to
 # How to use it
 Run `radigast -config radigast.toml` to connect to slack.
 
-
 # Plugins
+Radigast supports two types of plugins:
+The first type of plugin is a Go plugin that must be compiled with the Radigast cli tool. See more under `Developing Go Plugins`
+The second type of plugin uses JSON-RPC and can be written in most languages.
 
-## Developing Plugins
+An RPC plugin must provide the following methods: 
+ For an RPC plugin to work, it must offer the following methods:
+
+```Go
+ Name() string
+ Description() string
+ Usage() []string
+ Handle(args) string
+```
+ The args in Handle(args) will be of the following struct type:
+
+```Go
+ type Args struct {
+ 	// Chat user calling the plugin.
+ 	User string
+ 	// The arguments a user passes to the bot.
+ 	Fields []string
+ }
+
+```
+
+RPC plugins must be installed in a directory specified in the config file. Each plugin name must be added to the `rpcplugins` array in the config.
+
+
+## Developing Go Plugins
 Radigast uses the same plugin model as [telegraf](https://github.com/influxdb/telegraf) 
 
 * A plugin must conform to the `plugins.Registrator` interface
