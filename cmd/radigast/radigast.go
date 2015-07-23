@@ -48,7 +48,6 @@ func main() {
 
 	// load radigast plugins
 	config.LoadPlugins(bot)
-	config.LoadRPCPlugins(bot)
 
 	// Enable in-chat help command
 	bot.EnableHelpCommand()

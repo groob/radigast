@@ -66,7 +66,7 @@ func LoadConfig(path string) (*Config, error) {
 // LoadPlugins registers victor.Handlers with radigast
 // and adds any additional configuration to the plugin
 func (c Config) LoadPlugins(r victor.Robot) {
-	log.Printf("Loading %v plugins\n", len(c.plugins))
+	log.Printf("Loading %v plugins\n", len(c.plugins)+len(c.Rpcplugins))
 
 	for name := range plugins.Plugins {
 		registrator, ok := plugins.Plugins[name]
@@ -85,13 +85,14 @@ func (c Config) LoadPlugins(r victor.Robot) {
 	r.SetDefaultHandler(defaultFunc)
 }
 
-func (c Config) LoadRPCPlugins(r victor.Robot) {
+func (c Config) loadRPCPlugins(r victor.Robot) {
 	for _, name := range c.Rpcplugins {
 		plugin := plugins.NewRPCPlugin(name, c.PluginsPath)
 		handlers := plugin.Register()
 		for _, handler := range handlers {
 			r.HandleCommand(handler)
 		}
+		log.Printf("Loaded %s\n", name)
 	}
 }
 
@@ -109,6 +110,10 @@ func (c Config) applyPluginConfig(name string, plugin plugins.Registrator, r vic
 		}
 
 		log.Printf("Loaded %s\n", name)
+
+		if len(c.Rpcplugins) >= 1 {
+			c.loadRPCPlugins(r)
+		}
 	}
 }
 
