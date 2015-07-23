@@ -2,8 +2,11 @@
 slack_token = "slack_bot_token"
 bot_name = "data"
 plugins_path = "/opt/radigast/plugins"
-rpcplugins = ["HelloRPC"]
+# RPC Plugins. These are separate from the bot.
+rpcplugins = ["HelloGoBinary", "HelloPython", "HelloRubyPlugin"]
 
+
+# Go plugin. These must be compiled with the bot.
 [warranty]
 path = "/opt/warranty/warranty"
 
