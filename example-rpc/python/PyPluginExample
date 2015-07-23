@@ -1,0 +1,144 @@
+#!/usr/bin/env python
+# Asynchronous RPC server over STDIO. Plugin for radigast slackbot
+
+from __future__ import print_function
+import sys
+import time
+import pyjsonrpc
+import threading
+import Queue
+import signal
+import json
+import base64
+
+# --- Plugin Code should go here
+command_name = "chat-command"
+description = "Short description of your plugin"
+usage = ["param0", "param1", "param2"]
+
+def handle(params):
+
+	# Params["User"] == chat user who triggered the handler.
+	# Params["Fields"] == ["what", "the", "user", "said"].
+	# The chat bot will only accept a string as a response.
+	reply = "send a response back to " + params["User"]
+	return reply
+
+
+
+# --- RPC classes and functions ---
+# Borrowed mostly from https://github.com/xyproto/algernon/tree/master/plugins and
+# Example code from https://github.com/natefinch/pie
+# Everything below is code necessary to setup a plugin.
+# You shouldn't have to modify it.
+
+
+def log(*objs):
+    """Warning log function that prints to stderr"""
+    print("[plugin log]", *objs, file=sys.stderr)
+
+
+class EncDec:
+  """Decorator for decoding and encoding the arguments and return values"""
+
+  def __init__(self, f):
+    self.f = f
+
+  def __call__(self, *args, **kwargs):
+    a = json.loads(base64.decodestring(args[0]))
+    return base64.encodestring(json.dumps(self.f(self, *a)))
+
+
+class RPCPlugin(pyjsonrpc.JsonRpc):
+
+    # Remember to decorate with @EncDec if needed, to enc/dec to base64 and JSON
+
+    @pyjsonrpc.rpcmethod
+    def Name(self, args):
+        return command_name
+
+    @pyjsonrpc.rpcmethod
+    def Description(self, args):
+        return description
+
+    @pyjsonrpc.rpcmethod
+    def Usage(self, args):
+        return usage
+
+    @pyjsonrpc.rpcmethod
+    def Handle(self, params):
+        return handle(params)
+
+
+
+# --- Common functions ---
+
+queue = Queue.Queue()
+
+def worker(line, q, rpc_client):
+    """Worker thread that handles the RPC server calls fror us when requests come in via stdin"""
+
+    # Because the Go RPC format will send the method name formatted as
+    # Service.Method, we have to split some strings...
+
+    request = json.loads(line)
+    method = request["method"].split(".")[1]
+    request['method'] = method
+    new_request = json.dumps(request)
+    out = rpc_client.call(new_request)
+    q.put(out)
+    return
+
+def printer(q):
+    """Output handler, printer thread will poll the results queue and output results as they appear."""
+    while True:
+        out = q.get()
+        if out == "kill":
+            #log("Kill signal recieved, stopping threads")
+            return
+        sys.stdout.write(out + "\n")
+        sys.stdout.flush()
+    return
+
+printer_thread = threading.Thread(target=printer, args=[queue])
+
+def init():
+    """Initialise the printer thread and exit signal handler so that we kill long running threads on exit"""
+
+    printer_thread.start()
+
+    def signal_handler(signal, frame):
+        queue.put("kill")
+        printer_thread.join()
+        #sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+    return
+
+def main():
+    init()
+    rpc = RPCPlugin()
+
+    # Build the Lua RPC namespace for methods that starts with an uppercase letter
+    # for name in dir(rpc):
+    #   if name[0].isupper():
+    #     setattr(rpc, "Lua." + name, getattr(rpc, name, None))
+       
+    line = sys.stdin.readline()
+
+    # The handling of lines is asynchronous,
+    # so that out-of-order requests can be handled
+    while line:
+        try: 
+            this_input = line
+            t = threading.Thread(target=worker, args=[line, queue, rpc])
+            t.start()
+            line = sys.stdin.readline()
+        except Exception as e:
+            log("Exception occured: ", e)
+            queue.put("kill")
+            printer_thread.join()
+
+
+if __name__ == "__main__":
+    main()
