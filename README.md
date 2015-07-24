@@ -14,11 +14,13 @@ Run `radigast -config radigast.toml` to connect to slack.
 
 # Plugins
 Radigast supports two types of plugins:
-The first type of plugin is a Go plugin that must be compiled with the Radigast cli tool. See more under `Developing Go Plugins`
+The first type of plugin is a Go plugin that must be compiled with the Radigast cli tool. See more under `Developing Go Plugins`.
+Note: The plugins in /plugins/all are not currently compiled into the released binary as not everyone will find them useful.
+
 The second type of plugin uses JSON-RPC and can be written in most languages.
+There is a python example under [examples-rpc](https://github.com/groob/radigast/tree/master/example-rpc/python)
 
 An RPC plugin must provide the following methods: 
- For an RPC plugin to work, it must offer the following methods:
 
 ```Go
  Name() string
